@@ -4,7 +4,57 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style type='text/css'>
+    #silent-demo {
+        padding:0 15px;
+        border:thin solid silver;
+    }
+
+    code {
+        padding-top:1em;
+        display:block;
+    }
+</style>
+
+<div id='silent-demo'>
+    <p>authorization server response: <code id='response'></code></p>
+    <p>response parameters: <code id='response_parameters'></code></p>
 </div>
+
+@section Scripts {
+    <script type="text/javascript" src="/node_modules/oidc-client/dist/oidc-client.js"></script>
+    <script type="text/javascript">
+
+        const settings = {
+            // the authorization server is hosted at the same domain
+            authority : window.location.origin,
+            silent_redirect_uri: window.location.origin,
+            client_id: 'my-client',
+            response_type: 'id_token token',
+            scope: 'openid',
+            loadUserInfo: false,
+            silentRequestTimeout:10000,
+        };
+
+        const mgr = new Oidc.UserManager(settings);
+
+        const isIframe = window !== window.parent;
+        if(isIframe)
+        {
+            mgr.signinSilentCallback().then((user) => {
+                window.parent.postMessage('signinSilentCallback -> complete', '*');
+            });
+        }
+        else
+        {
+            window.addEventListener('message', (event) => {
+                console.log('message from iframe: ' + event.data);
+            });
+
+            mgr.signinSilent()
+                .then((user) => console.log(user))
+                .catch((err) => console.log(err));
+        }
+
+    </script>
+}
