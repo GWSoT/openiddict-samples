@@ -89,6 +89,7 @@ namespace AppWithFetchClient
 
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles();
             app.UseFileServer(new FileServerOptions
             {
                 RequestPath = "/node_modules",
