@@ -17,8 +17,7 @@
 </style>
 
 <div id='silent-demo'>
-    <p>authorization server response: <code id='response'></code></p>
-    <p>response parameters: <code id='response_parameters'></code></p>
+    <p>silent sign in response: <code id='response'></code></p>
 </div>
 
 @section Scripts {
@@ -26,7 +25,6 @@
     <script type="text/javascript">
 
         const settings = {
-            // the authorization server is hosted at the same domain
             authority : window.location.origin,
             silent_redirect_uri: window.location.origin,
             client_id: 'my-client',
@@ -47,12 +45,21 @@
         }
         else
         {
+            const signinSilentComplete = (user) => {
+                const json = JSON.stringify(user, null, 4);
+                window.document.getElementById('response').innerText = json; 
+            };
+
+            const signinSilentError = (err) => {
+                window.document.getElementById('response').innerText = err; 
+            };
+
             window.addEventListener('message', (event) => {
                 console.log('message from iframe: ' + event.data);
             });
 
             mgr.signinSilent()
-                .then((user) => console.log(user))
+                .then(signinSilentComplete)
                 .catch((err) => console.log(err));
         }
 
