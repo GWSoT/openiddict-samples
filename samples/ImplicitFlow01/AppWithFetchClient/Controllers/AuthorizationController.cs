@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 using System.Threading.Tasks;
 using AspNet.Security.OpenIdConnect.Extensions;
 using AspNet.Security.OpenIdConnect.Primitives;
@@ -36,14 +38,33 @@ public class AuthorizationController : Controller
     {
         if (!User.Identity.IsAuthenticated)
         {
-            return BadRequest("The user is not authenticated.");
+            // If the client application request promptless authentication,
+            // return an error indicating that the user is not logged in.
+            if (request.HasPrompt(OpenIdConnectConstants.Prompts.None))
+            {
+                var properties = new AuthenticationProperties(new Dictionary<string, string>
+                {
+                    [OpenIdConnectConstants.Properties.Error] = OpenIdConnectConstants.Errors.LoginRequired,
+                    [OpenIdConnectConstants.Properties.ErrorDescription] = "The user is not logged in."
+                });
+
+                // Ask OpenIddict to return a login_required error to the client application.
+                return Forbid(properties, OpenIddictServerDefaults.AuthenticationScheme);
+            }
         }
 
         // Retrieve the profile of the logged in user.
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return BadRequest("The user does not exist.");
+            var properties = new AuthenticationProperties(new Dictionary<string, string>
+            {
+                [OpenIdConnectConstants.Properties.Error] = OpenIdConnectConstants.Errors.LoginRequired,
+                [OpenIdConnectConstants.Properties.ErrorDescription] = "The user's account has been deleted."
+            });
+
+            // Ask OpenIddict to return a login_required error to the client application.
+            return Forbid(properties, OpenIddictServerDefaults.AuthenticationScheme);
         }
 
         // Create a new authentication ticket.
