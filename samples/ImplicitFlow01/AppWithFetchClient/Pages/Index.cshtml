@@ -4,82 +4,10 @@
     ViewData["Title"] = "Home page";
 }
 
-<style type='text/css'>
-    #silent-demo {
-        padding:0 15px;
-        border:thin solid silver;
-    }
-
-    code {
-        padding-top:1em;
-        display:block;
-    }
-</style>
-
 <div id='silent-demo'>
     <p>silent sign in response: <code id='signin_response'></code></p>
     <p>fetch response: <code id='fetch_response'></code></p>
 </div>
 
-@section Scripts {
-    <script type="text/javascript" src="/node_modules/oidc-client/dist/oidc-client.js"></script>
-    <script type="text/javascript">
-
-        const settings = {
-            authority : window.location.origin,
-            silent_redirect_uri: window.location.origin,
-            client_id: 'my-client',
-            response_type: 'id_token token',
-            scope: 'openid',
-            loadUserInfo: false,
-            silentRequestTimeout:10000,
-        };
-
-        const userManager = new Oidc.UserManager(settings);
-
-        const isIframe = window !== window.parent;
-        if(isIframe)
-        {
-            // Silent sign in always happens in child iframe.
-            // If we are in an iframe, then only process the silent sign in callback.
-            // This prevent an infinite loop.
-            userManager.signinSilentCallback().then((user) => {
-                // Optional: communicate from the child iframe to its parent.
-                // The userManager already does this, but we can optionally do more.
-                window.parent.postMessage('signinSilentCallback -> complete', '*');
-            });
-        }
-        else
-        {
-            const fetchUserResources = (access_token) => { // TODO
-                const url = '';
-                const options = {};
-                fetch(url, options)
-                    .then((response) => console.log(response))
-                    .catch((err) => console.log(err));
-            };
-
-            const showUserData = (user) => {
-                const json = JSON.stringify(user, null, 4);
-                window.document.getElementById('signin_response').innerText = json; 
-            };
-
-            const signinSilentError = (err) => {
-                window.document.getElementById('signin_response').innerText = err; 
-            };
-
-            window.addEventListener('message', (event) => {
-                // Optional: receive message from the child iframe.
-                console.log('message from iframe: ' + event.data);
-            });
-
-            userManager.signinSilent()
-                .then((user) => {
-                    showUserData(user);
-                    fetchUserResources(user.access_token);
-                })
-                .catch(signinSilentError);
-        }
-
-    </script>
-}
+<script type="text/javascript" src="/node_modules/oidc-client/dist/oidc-client.js"></script>
+<script type="text/javascript" src="/app.js"></script>

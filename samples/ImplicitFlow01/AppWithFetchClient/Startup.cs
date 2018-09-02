@@ -1,21 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using AppWithFetchClient.Data;
+using AspNet.Security.OpenIdConnect.Primitives;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using AppWithFetchClient.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenIddict.Abstractions;
 using OpenIddict.Core;
 using OpenIddict.EntityFrameworkCore.Models;
-using OpenIddict.Abstractions;
-using AspNet.Security.OpenIdConnect.Primitives;
 
 namespace AppWithFetchClient
 {
@@ -33,7 +28,6 @@ namespace AppWithFetchClient
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
-
                 options.UseOpenIddict();
             });
 
@@ -74,19 +68,10 @@ namespace AppWithFetchClient
                 .AddValidation();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
-
+            app.UseDeveloperExceptionPage();
+            app.UseDatabaseErrorPage();
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
@@ -113,31 +98,27 @@ namespace AppWithFetchClient
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 await context.Database.EnsureCreatedAsync();
 
-                await CreateApplicationsAsync();
+                var manager = scope.ServiceProvider
+                    .GetRequiredService<OpenIddictApplicationManager<OpenIddictApplication>>();
 
-                async Task CreateApplicationsAsync()
+                const string clientId = "my-client";
+                if (await manager.FindByClientIdAsync(clientId) == null)
                 {
-                    var manager = scope.ServiceProvider.GetRequiredService<OpenIddictApplicationManager<OpenIddictApplication>>();
-
-                    const string clientId = "my-client";
-
-                    if (await manager.FindByClientIdAsync(clientId) == null)
+                    var descriptor = new OpenIddictApplicationDescriptor
                     {
-                        var descriptor = new OpenIddictApplicationDescriptor
+                        ClientId = clientId,
+                        DisplayName = "My Client",
+                        RedirectUris = { new Uri("https://localhost:5001") },
+                        Permissions =
                         {
-                            ClientId = clientId,
-                            DisplayName = "My Client",
-                            RedirectUris = { new Uri("https://localhost:5001") },
-                            Permissions =
-                            {
-                                OpenIddictConstants.Permissions.Endpoints.Authorization,
-                                OpenIddictConstants.Permissions.GrantTypes.Implicit,
-                                OpenIddictConstants.Permissions.Scopes.Profile,
-                            }
-                        };
+                            OpenIddictConstants.Permissions.Endpoints.Authorization,
+                            OpenIddictConstants.Permissions.GrantTypes.Implicit,
+                            // allow the openid scope
+                            OpenIddictConstants.Permissions.Scopes.Profile,
+                        }
+                    };
 
-                        await manager.CreateAsync(descriptor);
-                    }
+                    await manager.CreateAsync(descriptor);
                 }
             }
         }

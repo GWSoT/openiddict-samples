@@ -1,0 +1,9 @@
+#silent-demo {
+    padding:0 15px;
+    border:thin solid silver;
+}
+
+code {
+    padding-top:1em;
+    display:block;
+}
