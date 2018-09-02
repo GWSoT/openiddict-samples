@@ -34,13 +34,13 @@ public class AuthorizationController : Controller
     }
 
     [HttpGet("~/connect/authorize")]
-    public async Task<IActionResult> Authorize(OpenIdConnectRequest request)
+    public async Task<IActionResult> Authorize(OpenIdConnectRequest oidcRequest)
     {
         if (!User.Identity.IsAuthenticated)
         {
             // If the client application request promptless authentication,
             // return an error indicating that the user is not logged in.
-            if (request.HasPrompt(OpenIdConnectConstants.Prompts.None))
+            if (oidcRequest.HasPrompt(OpenIdConnectConstants.Prompts.None))
             {
                 var properties = new AuthenticationProperties(new Dictionary<string, string>
                 {
@@ -68,7 +68,7 @@ public class AuthorizationController : Controller
         }
 
         // Create a new authentication ticket.
-        var ticket = await CreateTicketAsync(request, user);
+        var ticket = await CreateTicketAsync(oidcRequest, user);
 
         // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
         return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
