@@ -1,9 +1,8 @@
-#silent-demo {
-    padding:0 15px;
-    border:thin solid silver;
+body {
+  font-family: arial;
 }
 
-code {
-    padding-top:1em;
-    display:block;
+pre {
+  background-color: #f8f9fa;
+  padding:5px;
 }

@@ -47,16 +47,10 @@ const settings = {
 const userManager = new Oidc.UserManager(settings);
 
 //
-// Check whether this JavaScript is loading in an iframe.
-//
-const isIframe = window !== window.parent;
-
-//
 // Run the demo.
 //
-if (isIframe) {
-  // If we are in an iframe, only process the silent sign in callback.
-  // This prevents an infinite loop.
+if (window !== window.parent) {
+  // We are in an iframe, so only process the silent sign in callback.
   // Silent sign in always happens in child iframe.
   userManager.signinSilentCallback().then(() => {
     // Optional: communicate from the child iframe to its parent.
