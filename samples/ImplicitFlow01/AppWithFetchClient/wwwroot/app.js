@@ -62,7 +62,8 @@ const settings = {
   response_type: 'id_token token',
   scope: 'openid',
   loadUserInfo: false,
-  silentRequestTimeout: 10000,
+  // A long timeout can be helpful during debugging.
+  // silentRequestTimeout: 10000,
 };
 
 const userManager = new Oidc.UserManager(settings);
