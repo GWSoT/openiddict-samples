@@ -69,7 +69,7 @@ if (window !== window.parent) {
 } else {
   // Optional: receive message from the child iframe.
   window.addEventListener('message', (event) => {
-    console.log(`message from iframe: ${event.data}`); // eslint-disable-line no-console
+    window.document.getElementById('iframe_message').innerText = event.data;
   });
 
   userManager.signinSilent()
