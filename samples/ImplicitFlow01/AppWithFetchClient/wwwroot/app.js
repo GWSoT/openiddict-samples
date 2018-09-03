@@ -35,7 +35,7 @@ const fetchUserResources = (accessToken) => {
       return response.json();
     })
     .then((obj) => {
-      const json = JSON.stringify(obj);
+      const json = JSON.stringify(obj, null, 4);
       writeInnerText('fetch_response', json);
     })
     .catch((err) => {
