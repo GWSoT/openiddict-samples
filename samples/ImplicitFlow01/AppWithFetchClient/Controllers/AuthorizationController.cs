@@ -103,10 +103,10 @@ public class AuthorizationController : Controller
                 continue;
             }
 
-            var destinations = new List<string>
-                {
-                    OpenIdConnectConstants.Destinations.AccessToken
-                };
+            var destinations = new List<string> 
+            {
+                OpenIdConnectConstants.Destinations.AccessToken
+            };
 
             // Only add the iterated claim to the id_token if the corresponding scope was granted to the client application.
             // The other claims will only be added to the access_token, which is encrypted when using the default format.
