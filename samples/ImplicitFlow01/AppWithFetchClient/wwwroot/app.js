@@ -1,10 +1,15 @@
 /* global window, fetch, Oidc */
 
+let origin = `${window.location.protocol}//${window.location.hostname}`;
+if (window.location.port) {
+  origin += `:${window.location.port}`;
+}
+
 //
 // Define helper functions.
 //
 const fetchUserResources = (accessToken) => {
-  const url = `${window.location.origin}/api`;
+  const url = `${origin}/api`;
   const options = {
     method: 'GET',
     headers: {
@@ -35,8 +40,8 @@ const signinSilentError = (err) => {
 // Configure the oidc-client.js UserManager.
 //
 const settings = {
-  authority: window.location.origin,
-  silent_redirect_uri: window.location.origin,
+  authority: origin,
+  silent_redirect_uri: origin,
   client_id: 'my-client',
   response_type: 'id_token token',
   scope: 'openid',
