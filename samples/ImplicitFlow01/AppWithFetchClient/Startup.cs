@@ -57,12 +57,8 @@ namespace AppWithFetchClient
                 .AddServer(options =>
                 {
                     options.UseMvc();
-
                     options.EnableAuthorizationEndpoint("/connect/authorize");
-                    options.EnableTokenEndpoint("/connect/token");
-
                     options.AddEphemeralSigningKey();
-
                     options.AllowImplicitFlow();
                 })
                 .AddValidation();
