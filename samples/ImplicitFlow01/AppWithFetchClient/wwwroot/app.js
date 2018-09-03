@@ -17,7 +17,6 @@ const fetchUserResources = (accessToken) => {
     },
   };
 
-  // See https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
   fetch(url, options)
     .then(response => response.json())
     .then(obj => JSON.stringify(obj))
