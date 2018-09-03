@@ -13,6 +13,10 @@ const { origin } = window.location;
 //
 // Define helper functions.
 //
+const writeInnerText = (id, message) => {
+  window.document.getElementById(id).innerText = message;
+};
+
 const fetchUserResources = (accessToken) => {
   const url = `${origin}/api`;
   const options = {
@@ -23,21 +27,29 @@ const fetchUserResources = (accessToken) => {
   };
 
   fetch(url, options)
-    .then(response => response.json())
-    .then(obj => JSON.stringify(obj))
-    .then((json) => {
-      window.document.getElementById('fetch_response').innerText = json;
+    .then((response) => {
+      if (response.status !== 200) {
+        throw new Error(response.statusText);
+      }
+
+      return response.json();
     })
-    .catch(err => console.log(err)); // eslint-disable-line no-console
+    .then((obj) => {
+      const json = JSON.stringify(obj);
+      writeInnerText('fetch_response', json);
+    })
+    .catch((err) => {
+      writeInnerText('fetch_response', err);
+    });
 };
 
 const displayUserData = (user) => {
   const json = JSON.stringify(user, null, 4);
-  window.document.getElementById('signin_response').innerText = json;
+  writeInnerText('signin_response', json);
 };
 
 const signinSilentError = (err) => {
-  window.document.getElementById('signin_response').innerText = err;
+  writeInnerText('signin_response', err);
 };
 
 //
@@ -69,7 +81,7 @@ if (window !== window.parent) {
 } else {
   // Optional: receive message from the child iframe.
   window.addEventListener('message', (event) => {
-    window.document.getElementById('iframe_message').innerText = event.data;
+    writeInnerText('iframe_message', event.data);
   });
 
   userManager.signinSilent()
