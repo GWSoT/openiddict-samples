@@ -1,4 +1,4 @@
-/* global window, fetch, Oidc */
+/* global fetch, Oidc, window */
 
 let origin = `${window.location.protocol}//${window.location.hostname}`;
 if (window.location.port) {
