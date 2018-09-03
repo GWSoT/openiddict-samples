@@ -74,7 +74,7 @@ public class AuthorizationController : Controller
         return SignIn(ticket.Principal, ticket.Properties, ticket.AuthenticationScheme);
     }
 
-    private async Task<AuthenticationTicket> CreateTicketAsync(OpenIdConnectRequest request, IdentityUser user)
+    private async Task<AuthenticationTicket> CreateTicketAsync(OpenIdConnectRequest oidcRequest, IdentityUser user)
     {
         // Create a new ClaimsPrincipal containing the claims that
         // will be used to create an id_token, a token or a code.
@@ -86,7 +86,7 @@ public class AuthorizationController : Controller
             OpenIddictServerDefaults.AuthenticationScheme);
 
         // Set the list of scopes granted to the client application.
-        var scopes = request.GetScopes().ToImmutableArray();
+        var scopes = oidcRequest.GetScopes().ToImmutableArray();
 
         ticket.SetScopes(scopes);
         ticket.SetResources(await _scopeManager.ListResourcesAsync(scopes));
