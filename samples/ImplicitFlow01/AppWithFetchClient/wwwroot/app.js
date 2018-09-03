@@ -1,9 +1,14 @@
 /* global fetch, Oidc, window */
 
-let origin = `${window.location.protocol}//${window.location.hostname}`;
-if (window.location.port) {
-  origin += `:${window.location.port}`;
-}
+//
+// Disclaimer:
+//
+// This is not production code.
+// Its purpose is to demonstrate the OpenId Connect Implicit Flow with OpenIddict.
+// The code lacks JavaScript modules, mobile browser support, logging, and error handling.
+//
+
+const { origin } = window.location;
 
 //
 // Define helper functions.
