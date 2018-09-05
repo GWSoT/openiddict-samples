@@ -36,21 +36,29 @@ public class AuthorizationController : Controller
     [HttpGet("~/connect/authorize")]
     public async Task<IActionResult> Authorize(OpenIdConnectRequest oidcRequest)
     {
+        // This demo only supports first-party clients with prompt=none.
+        if (!oidcRequest.HasPrompt(OpenIdConnectConstants.Prompts.None))
+        {
+            var properties = new AuthenticationProperties(new Dictionary<string, string>
+            {
+                [OpenIdConnectConstants.Properties.Error] = OpenIdConnectConstants.Errors.AccessDenied,
+                [OpenIdConnectConstants.Properties.ErrorDescription] = "The request must have a prompt=none parameter value."
+            });
+
+            // Ask OpenIddict to return an access_denied error to the client application.
+            return Forbid(properties, OpenIddictServerDefaults.AuthenticationScheme);
+        }
+
         if (!User.Identity.IsAuthenticated)
         {
-            // If the client application request promptless authentication,
-            // return an error indicating that the user is not logged in.
-            if (oidcRequest.HasPrompt(OpenIdConnectConstants.Prompts.None))
+            var properties = new AuthenticationProperties(new Dictionary<string, string>
             {
-                var properties = new AuthenticationProperties(new Dictionary<string, string>
-                {
-                    [OpenIdConnectConstants.Properties.Error] = OpenIdConnectConstants.Errors.LoginRequired,
-                    [OpenIdConnectConstants.Properties.ErrorDescription] = "The user is not logged in."
-                });
+                [OpenIdConnectConstants.Properties.Error] = OpenIdConnectConstants.Errors.LoginRequired,
+                [OpenIdConnectConstants.Properties.ErrorDescription] = "The user is not logged in."
+            });
 
-                // Ask OpenIddict to return a login_required error to the client application.
-                return Forbid(properties, OpenIddictServerDefaults.AuthenticationScheme);
-            }
+            // Ask OpenIddict to return a login_required error to the client application.
+            return Forbid(properties, OpenIddictServerDefaults.AuthenticationScheme);
         }
 
         // Retrieve the profile of the logged in user.
@@ -103,7 +111,7 @@ public class AuthorizationController : Controller
                 continue;
             }
 
-            var destinations = new List<string> 
+            var destinations = new List<string>
             {
                 OpenIdConnectConstants.Destinations.AccessToken
             };
