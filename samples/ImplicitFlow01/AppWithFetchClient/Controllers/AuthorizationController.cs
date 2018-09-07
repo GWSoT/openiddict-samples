@@ -41,8 +41,9 @@ public class AuthorizationController : Controller
         {
             var properties = new AuthenticationProperties(new Dictionary<string, string>
             {
-                [OpenIdConnectConstants.Properties.Error] = OpenIdConnectConstants.Errors.AccessDenied,
-                [OpenIdConnectConstants.Properties.ErrorDescription] = "The request must have a prompt=none parameter value."
+                [OpenIdConnectConstants.Properties.Error] = OpenIdConnectConstants.Errors.InvalidRequest,
+                [OpenIdConnectConstants.Properties.ErrorDescription] 
+                    = "The authorization request must have a prompt=none parameter."
             });
 
             // Ask OpenIddict to return an access_denied error to the client application.
